@@ -11,10 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.Map;
@@ -37,6 +34,18 @@ public class ContactController {
         throwExceptionIfNotValid(result);
         Contact contact = contactService.createContact(contactInput);
         logger.info("POST '/contact' was returned with {}", contact);
+        return ResponseEntity.status(200).body(contact);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Contact> updateContact(
+            @RequestBody @Valid ContactInput contactInput,
+            @PathVariable Long id,
+            BindingResult result) {
+        logger.info("PUT '/contact' was called with id {} and body {}",id, contactInput);
+        throwExceptionIfNotValid(result);
+        Contact contact = contactService.updateContact(id, contactInput);
+        logger.info("PUT '/contact' was returned with {}", contact);
         return ResponseEntity.status(200).body(contact);
     }
 

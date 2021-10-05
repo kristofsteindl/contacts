@@ -33,6 +33,7 @@ public class ContactService {
         return companyRepository.findAll();
     }
 
+
     public Contact createContact(ContactInput contactInput) {
         Contact contact = new Contact();
         return createOrUpdateContact(contact, contactInput);
@@ -58,6 +59,8 @@ public class ContactService {
 
         contact.setFirstName(contactInput.getFirstName());
         contact.setLastName(contactInput.getLastName());
+        contact.setEmail(contactInput.getEmail());
+        contact.setComment(contactInput.getComment());
         contact.setCompany(company);
         contact.setPhone(phone);
         contact.setStatus(status);
