@@ -15,6 +15,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -64,6 +65,28 @@ public class ContactController {
         Contact contact = contactService.findContactById(id);
         logger.info("GET '/contact' was returned with {}", contact);
         return ResponseEntity.status(200).body(contact);
+    }
+
+    @GetMapping
+    public ResponseEntity<PagedList> getActiveContacts(
+            @RequestParam(value="sortBy", required = false) String sortBy,
+            @RequestParam(value="queryString", required = false) String queryString,
+            @RequestParam(value="page", required = false) Integer page,
+            @RequestParam(value= "size", required = false) Integer size
+    ) {
+        logger.info("GET '/contact' was called with parameters:" +
+                "sortBy=" + sortBy +
+                ", queryString=" + queryString +
+                ", page=" + page +
+                ", size=" + size);
+        ContactQueryRequest request = ContactQueryRequest.builder()
+                .sortBy(sortBy)
+                .queryString(queryString)
+                .page(page)
+                .size(size).build();
+        PagedList contacts = contactService.findContacts(request);
+        logger.info("GET '/contact' was returned with a list of {} contacts", contacts.getContent().size());
+        return ResponseEntity.status(200).body(contacts);
     }
 
 

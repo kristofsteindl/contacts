@@ -12,19 +12,33 @@ import com.ksteindl.contacts.domain.repository.CompanyRepository;
 import com.ksteindl.contacts.domain.repository.ContactRepository;
 import com.ksteindl.contacts.exception.ResourceNotFoundException;
 import com.ksteindl.contacts.exception.ValidationException;
+import com.ksteindl.contacts.web.ContactQueryRequest;
+import com.ksteindl.contacts.web.PagedList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
+import java.util.Set;
 
 @Service
 public class ContactService {
 
     Logger logger = LoggerFactory.getLogger(ContactService.class);
+
+    public static final Sort DEFAULT_SORT_BY_NAME = Sort.by("firstName").ascending().and(Sort.by("lastName")).ascending();
+    public static final Integer DEFAULT_PAGE_SIZE = 10;
+    public static final Integer DEFAULT_PAGE = 0;
+
+    public static final String COMPANY_PARAM = "company";
+    public static final Set<String> VALID_SORT_PARAMS =Set.of("email", "phone");
 
     @Autowired
     private CompanyRepository companyRepository;
@@ -59,8 +73,39 @@ public class ContactService {
         return contactRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("contact", id));
     }
 
+
+    public PagedList findContacts(ContactQueryRequest request) {
+        Sort sortBy = getSortBy(request.getSortBy());
+        Integer size = request.size;
+        Integer page = request.page;
+        String queryString = request.queryString;
+        Pageable paging = PageRequest.of(
+                page == null || page < 1 ? DEFAULT_PAGE : page,
+                size == null || size < 1 ? DEFAULT_PAGE_SIZE : size,
+                sortBy);
+        Page<Contact> contactPage;
+        if (queryString == null || queryString.equals("")) {
+            contactPage = contactRepository.findContactsByStatus(Status.ACTIVE, paging);
+        } else {
+            contactPage = contactRepository.findContactsByQueryString(queryString, paging);
+        }
+        return new PagedList(contactPage);
+
+    }
+
     public Company findCompanyById(Long id) {
         return companyRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("company", id));
+    }
+
+    private Sort getSortBy(String stringSortBy) {
+        if (stringSortBy == null || stringSortBy.equals("")) {
+            return DEFAULT_SORT_BY_NAME;
+        } else if (stringSortBy.equals(COMPANY_PARAM)){
+            return Sort.by(Sort.Direction.DESC, "company.name");
+        } else if (VALID_SORT_PARAMS.contains(stringSortBy)) {
+            return Sort.by(Sort.Direction.DESC, stringSortBy);
+        }
+        throw new ValidationException(String.format("Sorting parameter must be only 'company', 'name' or among these: %s", VALID_SORT_PARAMS));
     }
 
     private Contact createOrUpdateContact(Contact contact, ContactInput contactInput) {
