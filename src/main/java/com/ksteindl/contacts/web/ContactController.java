@@ -58,6 +58,14 @@ public class ContactController {
         logger.info("DELETE '/contact' was succesful for id {}", id);
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<Contact> getContact(@PathVariable Long id) {
+        logger.info("GET '/contact' was called with id {}",id);
+        Contact contact = contactService.findContactById(id);
+        logger.info("GET '/contact' was returned with {}", contact);
+        return ResponseEntity.status(200).body(contact);
+    }
+
 
     //This method should be moved out to a separate @Service, when multiple Controller will use
     private void throwExceptionIfNotValid(BindingResult result) {

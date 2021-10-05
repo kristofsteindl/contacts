@@ -35,7 +35,7 @@ public class Contact {
     private Status status;
 
     private OffsetDateTime createdAt;
-    
+
     private OffsetDateTime updatedAt;
 
     @PrePersist
