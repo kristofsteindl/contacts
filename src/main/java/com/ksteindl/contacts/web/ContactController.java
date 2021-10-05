@@ -7,6 +7,7 @@ import com.ksteindl.contacts.exception.ValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -49,12 +50,16 @@ public class ContactController {
         return ResponseEntity.status(200).body(contact);
     }
 
-    @GetMapping
-    public ResponseEntity<String> getWelcome() {
-        return ResponseEntity.status(200).body("hello world");
+    @DeleteMapping
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
+    public void deleteContact(@PathVariable Long id) {
+        logger.info("DELETE '/contact' was called with id {}",id);
+        contactService.deleteContact(id);
+        logger.info("DELETE '/contact' was succesful for id {}", id);
     }
 
-    // This method could be moved to a separate @Service, if multiple Controller used
+
+    //This method should be moved out to a separate @Service, when multiple Controller will use
     private void throwExceptionIfNotValid(BindingResult result) {
         if (result.hasErrors()) {
             Map<String, String> errorMap = result.getFieldErrors().stream().collect(Collectors.toMap(

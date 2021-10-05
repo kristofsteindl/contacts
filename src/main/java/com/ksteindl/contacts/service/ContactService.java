@@ -15,6 +15,8 @@ import com.ksteindl.contacts.exception.ValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.MailSender;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
@@ -28,6 +30,8 @@ public class ContactService {
     private CompanyRepository companyRepository;
     @Autowired
     private ContactRepository contactRepository;
+    @Autowired
+    private MailSender mailSender;
 
     public Iterable<Company> getCompanies() {
         return companyRepository.findAll();
@@ -36,12 +40,19 @@ public class ContactService {
 
     public Contact createContact(ContactInput contactInput) {
         Contact contact = new Contact();
-        return createOrUpdateContact(contact, contactInput);
+        Contact persisted = createOrUpdateContact(contact, contactInput);
+        sendWelcomeMessage(contact);
+        return persisted;
     }
 
     public Contact updateContact(Long id, ContactInput contactInput) {
         Contact contact = findContactById(id);
         return createOrUpdateContact(contact, contactInput);
+    }
+
+    public void deleteContact(Long id) {
+        Contact contact = findContactById(id);
+        contactRepository.delete(contact);
     }
 
     public Contact findContactById(Long id) {
@@ -65,6 +76,15 @@ public class ContactService {
         contact.setPhone(phone);
         contact.setStatus(status);
         return contactRepository.save(contact);
+    }
+
+    private void sendWelcomeMessage(Contact contact) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom("noreply@contacts.com");
+        message.setTo(contact.getEmail());
+        message.setSubject("welcome");
+        message.setText(String.format("Üdv, %s!", contact.getFirstName()));
+        mailSender.send(message);
     }
 
     private Status validateStatusAndGet(String stringStatus) {
