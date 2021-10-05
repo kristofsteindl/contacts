@@ -34,10 +34,8 @@ public class Contact {
     @Enumerated(EnumType.STRING)
     private Status status;
 
-    @JsonIgnore
     private OffsetDateTime createdAt;
-
-    @JsonIgnore
+    
     private OffsetDateTime updatedAt;
 
     @PrePersist
