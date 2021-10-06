@@ -1,4 +1,4 @@
-package com.ksteindl.contacts.domain.input;
+package com.ksteindl.contacts.web.input;
 
 import lombok.Data;
 

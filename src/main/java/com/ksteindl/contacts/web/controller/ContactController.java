@@ -1,9 +1,12 @@
-package com.ksteindl.contacts.web;
+package com.ksteindl.contacts.web.controller;
 
 import com.ksteindl.contacts.domain.entities.Contact;
-import com.ksteindl.contacts.domain.input.ContactInput;
+import com.ksteindl.contacts.web.WebUtils;
+import com.ksteindl.contacts.web.input.ContactQueryRequest;
+import com.ksteindl.contacts.web.response.PagedList;
 import com.ksteindl.contacts.service.ContactService;
 import com.ksteindl.contacts.exception.ValidationException;
+import com.ksteindl.contacts.web.input.ContactInput;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +18,6 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -33,7 +35,7 @@ public class ContactController {
             @RequestBody @Valid ContactInput contactInput,
             BindingResult result) {
         logger.info("POST '/contact' was called with {}", contactInput);
-        throwExceptionIfNotValid(result);
+        WebUtils.throwExceptionIfNotValid(result);
         Contact contact = contactService.createContact(contactInput);
         logger.info("POST '/contact' was returned with {}", contact);
         return ResponseEntity.status(200).body(contact);
@@ -45,7 +47,7 @@ public class ContactController {
             @PathVariable Long id,
             BindingResult result) {
         logger.info("PUT '/contact' was called with id {} and body {}",id, contactInput);
-        throwExceptionIfNotValid(result);
+        WebUtils.throwExceptionIfNotValid(result);
         Contact contact = contactService.updateContact(id, contactInput);
         logger.info("PUT '/contact' was returned with {}", contact);
         return ResponseEntity.status(200).body(contact);
@@ -87,19 +89,6 @@ public class ContactController {
         PagedList contacts = contactService.findContacts(request);
         logger.info("GET '/contact' was returned with a list of {} contacts", contacts.getContent().size());
         return ResponseEntity.status(200).body(contacts);
-    }
-
-
-    //This method should be moved out to a separate @Service, when multiple Controller will use
-    private void throwExceptionIfNotValid(BindingResult result) {
-        if (result.hasErrors()) {
-            Map<String, String> errorMap = result.getFieldErrors().stream().collect(Collectors.toMap(
-                    FieldError::getField,
-                    FieldError::getDefaultMessage,
-                    (errorMessage1, errorMessage2) -> errorMessage1 + ", " + errorMessage2));
-            logger.info("ValidationException is being thrown with errorMap: {0}", errorMap);
-            throw new ValidationException(errorMap);
-        }
     }
 
 

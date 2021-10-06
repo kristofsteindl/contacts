@@ -1,8 +1,7 @@
-package com.ksteindl.contacts.web;
+package com.ksteindl.contacts.web.input;
 
 import lombok.Builder;
 import lombok.Data;
-import org.springframework.web.bind.annotation.RequestParam;
 
 @Data
 @Builder

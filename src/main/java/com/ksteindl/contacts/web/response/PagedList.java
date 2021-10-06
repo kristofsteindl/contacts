@@ -1,4 +1,4 @@
-package com.ksteindl.contacts.web;
+package com.ksteindl.contacts.web.response;
 
 import com.ksteindl.contacts.domain.entities.Contact;
 import lombok.Data;

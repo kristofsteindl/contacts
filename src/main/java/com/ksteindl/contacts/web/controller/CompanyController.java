@@ -1,4 +1,4 @@
-package com.ksteindl.contacts.web;
+package com.ksteindl.contacts.web.controller;
 
 import com.ksteindl.contacts.domain.entities.Company;
 import com.ksteindl.contacts.service.ContactService;
