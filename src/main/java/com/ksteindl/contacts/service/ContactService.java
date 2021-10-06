@@ -25,6 +25,7 @@ import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.Arrays;
 import java.util.Set;
 
@@ -33,7 +34,7 @@ public class ContactService {
 
     Logger logger = LoggerFactory.getLogger(ContactService.class);
 
-    public static final Sort DEFAULT_SORT_BY_NAME = Sort.by("firstName").ascending().and(Sort.by("lastName")).ascending();
+    public static final Sort DEFAULT_SORT_BY_NAME = Sort.by("lastName").ascending().and(Sort.by("firstName")).ascending();
     public static final Integer DEFAULT_PAGE_SIZE = 10;
     public static final Integer DEFAULT_PAGE = 0;
 
@@ -74,6 +75,9 @@ public class ContactService {
     }
 
 
+    //The specification mentions 4 attributes to visualize, but the whole Contact object is returned because of simplicity.
+    //Visualization of the required attributes is FE responsibility.
+    @Transactional
     public PagedList findContacts(ContactQueryRequest request) {
         Sort sortBy = getSortBy(request.getSortBy());
         Integer size = request.size;
@@ -101,9 +105,9 @@ public class ContactService {
         if (stringSortBy == null || stringSortBy.equals("")) {
             return DEFAULT_SORT_BY_NAME;
         } else if (stringSortBy.equals(COMPANY_PARAM)){
-            return Sort.by(Sort.Direction.DESC, "company.name");
+            return Sort.by(Sort.Direction.ASC, "company.name");
         } else if (VALID_SORT_PARAMS.contains(stringSortBy)) {
-            return Sort.by(Sort.Direction.DESC, stringSortBy);
+            return Sort.by(Sort.Direction.ASC, stringSortBy);
         }
         throw new ValidationException(String.format("Sorting parameter must be only 'company', 'name' or among these: %s", VALID_SORT_PARAMS));
     }
