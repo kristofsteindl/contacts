@@ -9,6 +9,7 @@ import com.ksteindl.contacts.web.WebUtils;
 import com.ksteindl.contacts.web.input.AppUserInput;
 import com.ksteindl.contacts.service.AppUserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -40,7 +41,7 @@ public class AppUserController {
     public ResponseEntity<AppUser> registerUser(@Valid @RequestBody AppUserInput userInput, BindingResult result) {
         WebUtils.throwExceptionIfNotValid(result);
         AppUser newUser = appUserService.saveUser(userInput);
-        return ResponseEntity.ok(newUser);
+        return ResponseEntity.status(HttpStatus.CREATED).body(newUser);
     }
 
     @PostMapping("/login")
@@ -53,7 +54,7 @@ public class AppUserController {
                 )
         );
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        String jwt = JwtAuthenticationFilter.TOKEN_PREFIX + jwtProvider.generateToken(authentication);
+        String jwt = jwtProvider.generateToken(authentication);
         return ResponseEntity.ok(new JwtLoginResponse(true, jwt));
 
     }

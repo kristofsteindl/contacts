@@ -114,7 +114,13 @@ public class ContactService {
 
     private Contact createOrUpdateContact(Contact contact, ContactInput contactInput) {
         Company company = findCompanyById(contactInput.getCompanyId());
-        String phone = validateE164AndGetPhoneNumber(contactInput.getPhone());
+        String phone;
+        String phoneInput = contactInput.getPhone();
+        if (phoneInput == null || phoneInput.equals("")) {
+            phone = null;
+        } else {
+            phone = validateE164AndGetPhoneNumber(contactInput.getPhone());
+        }
         Status status = validateStatusAndGet(contactInput.getStatus());
 
         contact.setFirstName(contactInput.getFirstName());

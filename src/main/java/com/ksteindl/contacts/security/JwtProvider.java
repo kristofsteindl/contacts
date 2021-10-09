@@ -1,9 +1,12 @@
 package com.ksteindl.contacts.security;
 
 import com.ksteindl.contacts.domain.entities.AppUser;
+import com.ksteindl.contacts.exception.ResourceNotFoundException;
+import com.ksteindl.contacts.service.AppUserService;
 import io.jsonwebtoken.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
@@ -15,12 +18,18 @@ import java.util.Map;
 @Component
 public class JwtProvider {
 
+    @Autowired
+    private AppUserService appUserService;
+
     public static final String SECRET = "SecretKeyToGenJWTs";
 
-    public String generateToken(Authentication authentication){
-        AppUser user = (AppUser) authentication.getPrincipal();
-        String userId = Long.toString(user.getId());
+    public String generateToken(Authentication authentication) {
+        return generateToken(authentication.getName());
+    }
 
+    public String generateToken(String username){
+        AppUser user = appUserService.findByUsername(username).orElseThrow(() -> new ResourceNotFoundException("user", username));
+        String userId = Long.toString(user.getId());
         Map<String,Object> claims = new HashMap<>();
         claims.put("id", userId);
         claims.put("username", user.getUsername());

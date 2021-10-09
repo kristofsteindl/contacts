@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
-import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
@@ -21,9 +20,6 @@ import java.util.Collections;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     public static final String HEADER_STRING = "Authorization";
-
-    public static final String TOKEN_PREFIX = "Bearer ";
-
     @Autowired
     private JwtProvider tokenProvider;
 
@@ -36,15 +32,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             HttpServletResponse httpServletResponse,
             FilterChain filterChain) throws ServletException, IOException {
         try {
-            String bearerToken = httpServletRequest.getHeader(HEADER_STRING);
-            if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(TOKEN_PREFIX)) {
-                String jwt = bearerToken.substring(TOKEN_PREFIX.length());
-                Long userId = tokenProvider.getUserIdFromToken(jwt);
-                AppUser user = customUserDetailsService.loadUserById(userId);
-                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(user, null, Collections.emptyList());
-                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(httpServletRequest));
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-            }
+            String jwt = httpServletRequest.getHeader(HEADER_STRING);
+            Long userId = tokenProvider.getUserIdFromToken(jwt);
+            AppUser user = customUserDetailsService.loadUserById(userId);
+            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(user, null, Collections.emptyList());
+            authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(httpServletRequest));
+            SecurityContextHolder.getContext().setAuthentication(authentication);
         } catch (SignatureException signatureException) {
             logger.info("Invalid JWT Signature");
         } catch (MalformedJwtException malformedJwtException) {

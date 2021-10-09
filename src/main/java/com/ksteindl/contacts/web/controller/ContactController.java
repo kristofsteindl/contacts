@@ -38,7 +38,7 @@ public class ContactController {
         WebUtils.throwExceptionIfNotValid(result);
         Contact contact = contactService.createContact(contactInput);
         logger.info("POST '/contact' was returned with {}", contact);
-        return ResponseEntity.status(200).body(contact);
+        return ResponseEntity.status(HttpStatus.CREATED).body(contact);
     }
 
     @PutMapping("/{id}")
@@ -50,7 +50,7 @@ public class ContactController {
         WebUtils.throwExceptionIfNotValid(result);
         Contact contact = contactService.updateContact(id, contactInput);
         logger.info("PUT '/contact' was returned with {}", contact);
-        return ResponseEntity.status(200).body(contact);
+        return ResponseEntity.status(HttpStatus.CREATED).body(contact);
     }
 
     @DeleteMapping
