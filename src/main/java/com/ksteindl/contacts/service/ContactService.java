@@ -65,9 +65,11 @@ public class ContactService {
         return createOrUpdateContact(contact, contactInput);
     }
 
-    public void deleteContact(Long id) {
+    public Contact deleteContact(Long id) {
         Contact contact = findContactById(id);
-        contactRepository.delete(contact);
+        contact.setStatus(Status.DELETED);
+        contactRepository.save(contact);
+        return contact;
     }
 
     public Contact findContactById(Long id) {

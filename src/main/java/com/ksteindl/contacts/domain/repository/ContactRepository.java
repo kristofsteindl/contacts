@@ -8,10 +8,14 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface ContactRepository extends CrudRepository<Contact, Long> {
 
     Page<Contact> findContactsByStatus(Status status, Pageable pageable);
+
+    List<Contact> findAll();
 
     @Query("SELECT c FROM Contact c WHERE c.status = 'ACTIVE' and (" +
             "c.firstName like %?1% or " +

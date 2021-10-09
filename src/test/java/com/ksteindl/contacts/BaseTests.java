@@ -27,8 +27,7 @@ public class BaseTests {
         if (first) {
             appUserService.saveUser(TestUtils.getAdminInput());
             initCompanies(companyRepository);
-
-
+            contactService.createContact(TestUtils.getPrestoredContactInput());
             TOKEN_FOR_ADMIN = jwtProvider.generateToken(TestUtils.ADMIN_USERNAME);
             first = false;
         }

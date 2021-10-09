@@ -53,12 +53,12 @@ public class ContactController {
         return ResponseEntity.status(HttpStatus.CREATED).body(contact);
     }
 
-    @DeleteMapping
-    @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    public void deleteContact(@PathVariable Long id) {
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Contact> deleteContact(@PathVariable Long id) {
         logger.info("DELETE '/contact' was called with id {}",id);
-        contactService.deleteContact(id);
-        logger.info("DELETE '/contact' was succesful for id {}", id);
+        Contact contact = contactService.deleteContact(id);
+        logger.info("DELETE '/contact' was returned with {}", contact);
+        return ResponseEntity.status(HttpStatus.OK).body(contact);
     }
 
     @GetMapping("/{id}")
