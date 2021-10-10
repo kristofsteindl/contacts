@@ -2,9 +2,9 @@
 Rest API for managing contacts<br>
 
 Please make sure to have a properly configured Postgres database up and running, and modify the `application.yml` according to this (if needed). 
-To run the application run `mvn spring-boot:run` command from root.
+To run the application run `mvn spring-boot:run` command from project root.
 
-In order to use `contact` endpoints, create a user, log in, and the use the returned `token` in the header of the request (`key='Authorization'`, `value=<token>`)
+In order to use `contact` endpoints, create a user, log in, and use the returned `token` in the header of the request (`key=Authorization`, `value=<token>`)
 ### Create User
 
 ### `POST: <app-url>/api/users/register`<br>
