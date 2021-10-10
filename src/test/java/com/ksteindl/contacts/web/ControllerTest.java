@@ -13,6 +13,7 @@ import com.ksteindl.contacts.web.input.AppUserInput;
 import com.ksteindl.contacts.web.input.ContactInput;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hamcrest.core.IsNot;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -989,6 +990,20 @@ public class ControllerTest extends BaseTests {
         logger.info("status code: " + result.getResponse().getStatus());
         logger.info("response content:\n" + result.getResponse().getContentAsString());
     }
+
+    @Test
+    void testQueryContacts_whenDefault_gotNoDeletedHit() throws Exception {
+        String token = jwtProvider.generateToken(TestUtils.ADMIN_USERNAME);
+        MvcResult result = mvc.perform(get(CONTACT_URL + "?queryString=dummy")
+                        .header("Authorization", token))
+                .andExpect(status().is(200))
+                .andExpect(jsonPath("$.content[*].status", IsNot.not(hasItem(Status.DELETED.name()))))
+                .andReturn();
+        logger.info("status code: " + result.getResponse().getStatus());
+        logger.info("response content:\n" + result.getResponse().getContentAsString());
+    }
+
+
 
 
 

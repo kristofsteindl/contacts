@@ -1,10 +1,13 @@
 # contacts
-Rest API for managing contacts
+Rest API for managing contacts<br>
+
+Please make sure, that a Postgres database is up and running with an appropriate setup, and modify the `application.yml` according to this (if needed). 
+To run the application, from root run `mvn spring-boot:run`
 
 In order to use `contact` endpoints, create a user, log in, and the use the returned `token` in the header of the request (`key='Authorization'`, `value=<token>`)
 ### Create User
 
-###`POST: <app-url>/api/users/register`<br>
+### `POST: <app-url>/api/users/register`<br>
 ```
 {
     "username": "john.doe",
@@ -15,7 +18,7 @@ In order to use `contact` endpoints, create a user, log in, and the use the retu
 
 ### Log in
 
-###`POST: <app-url>/api/users/login`<br>
+### `POST: <app-url>/api/users/login`<br>
 ```
 {
     "username": "john.doe",
@@ -29,9 +32,9 @@ Response
 "token": "eyJhbGciOiJIUzUxMiJ9.eyJpZCI6IjkiLCJpYXQiOjE2MzM4NzU4NzQsInVzZXJuYW1lIjoiaGVsbG82In0.kWko-KKJosXTP1CSHIddD3lwVrP57JT990v5k8YRGfdZHeTp4Zw37B5iRBwzLqKkE7DGJ__fRe8n1kVxqtwmJA"
 }
 ```
-## Contacts
-###`POST: <app-url>/api/contact`<br>
-Creates a new contact according to the input values. For the input requirements, please see  [SPECIFICATION_HU.md](SPECIFICATION_HU.md).
+### Create contact
+### `POST: <app-url>/api/contact`<br>
+Creates a new contact according to the input values and send a welcome e-mail to the e-mail address of the new contact. For the input requirements, please see  [SPECIFICATION_HU.md](SPECIFICATION_HU.md).
 ```
 {
     "firstName": "Lajos",
@@ -68,7 +71,8 @@ Response
     "message": "+12345 is unknown phone number format"
 }
 ```
-###`PUT: <app-url>/api/contact/{id}`<br>
+### Update contact
+### `PUT: <app-url>/api/contact/{id}`<br>
 Updates an existing contact according to the input values. Every attribute can be changed while these fit for the input requirements ([SPECIFICATION_HU.md](SPECIFICATION_HU.md)).
 #### Parameter
 `id ` - the id of the updating contact
@@ -108,6 +112,7 @@ Response
     "message": "+12345 is unknown phone number format"
 }
 ```
+### Delete contact
 ###`DELETE: <app-url>/api/contact/{id}`<br>
 Sets the status of an existing contact to DELETED.
 #### Parameter
@@ -131,6 +136,7 @@ Response
     "updatedAt": "2021-10-10T16:45:45.475944+02:00"
 }
 ```
+### Get contact details
 ###`GET: <app-url>/api/contact/{id}`<br>
 Returns the corresponding contact to the id.
 #### Parameter
@@ -154,6 +160,7 @@ Response
     "updatedAt": "2021-10-10T16:45:45.475944+02:00"
 }
 ```
+### List contacts
 ###`GET: <app-url>/api/contact`<br>
 Returns a paged list of contacts according to the query parameters
 #### Query Parameters
