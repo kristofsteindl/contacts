@@ -99,7 +99,7 @@ public class ControllerTest extends BaseTests {
                 .andExpect(jsonPath("$.lastName", is(input.getLastName())))
                 .andExpect(jsonPath("$.company.id", is(input.getCompanyId().intValue())))
                 .andExpect(jsonPath("$.comment", is(input.getComment())))
-                .andExpect(jsonPath("$.status", is(input.getStatus())))
+                .andExpect(jsonPath("$.status", is(Status.ACTIVE.name())))
                 .andReturn();
         logger.info("status code: " + result.getResponse().getStatus());
         logger.info("response content:\n" + result.getResponse().getContentAsString());
@@ -125,7 +125,7 @@ public class ControllerTest extends BaseTests {
         Assertions.assertEquals(input.getLastName(), stored.getLastName());
         Assertions.assertEquals(input.getCompanyId().intValue(),  stored.getCompany().getId());
         Assertions.assertEquals(input.getComment(), stored.getComment());
-        Assertions.assertEquals(input.getStatus(), stored.getStatus().name());
+        Assertions.assertEquals(Status.ACTIVE.name(), stored.getStatus().name());
         logger.info("status code: " + result.getResponse().getStatus());
         logger.info("response content:\n" + result.getResponse().getContentAsString());
     }
@@ -317,22 +317,6 @@ public class ControllerTest extends BaseTests {
         logger.info("response content:\n" + result.getResponse().getContentAsString());
     }
 
-    @Test
-    @Rollback
-    @Transactional
-    void testCreateContact_whenStatusNotValid_got401() throws Exception {
-        String token = jwtProvider.generateToken(TestUtils.ADMIN_USERNAME);
-        ContactInput input = TestUtils.getTestContactInput();
-        input.setStatus("non-valid");
-        MvcResult result = mvc.perform(post(CONTACT_URL)
-                        .header("Authorization", token)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(asJsonString(input)))
-                .andExpect(status().is(400))
-                .andReturn();
-        logger.info("status code: " + result.getResponse().getStatus());
-        logger.info("response content:\n" + result.getResponse().getContentAsString());
-    }
 
     //UPDATE CONTACT
     @Test
@@ -402,7 +386,6 @@ public class ControllerTest extends BaseTests {
                 .andExpect(jsonPath("$.lastName", is(input.getLastName())))
                 .andExpect(jsonPath("$.company.id", is(input.getCompanyId().intValue())))
                 .andExpect(jsonPath("$.comment", is(input.getComment())))
-                .andExpect(jsonPath("$.status", is(input.getStatus())))
                 .andReturn();
         logger.info("status code: " + result.getResponse().getStatus());
         logger.info("response content:\n" + result.getResponse().getContentAsString());
@@ -428,7 +411,6 @@ public class ControllerTest extends BaseTests {
         Assertions.assertEquals(input.getLastName(), stored.getLastName());
         Assertions.assertEquals(input.getCompanyId().intValue(),  stored.getCompany().getId());
         Assertions.assertEquals(input.getComment(), stored.getComment());
-        Assertions.assertEquals(input.getStatus(), stored.getStatus().name());
         logger.info("status code: " + result.getResponse().getStatus());
         logger.info("response content:\n" + result.getResponse().getContentAsString());
     }
@@ -615,23 +597,6 @@ public class ControllerTest extends BaseTests {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(asJsonString(input)))
                 .andExpect(status().is(201))
-                .andReturn();
-        logger.info("status code: " + result.getResponse().getStatus());
-        logger.info("response content:\n" + result.getResponse().getContentAsString());
-    }
-
-    @Test
-    @Rollback
-    @Transactional
-    void testUpdateContact_whenStatusNotValid_got401() throws Exception {
-        String token = jwtProvider.generateToken(TestUtils.ADMIN_USERNAME);
-        ContactInput input = TestUtils.getTestContactInput();
-        input.setStatus("non-valid");
-        MvcResult result = mvc.perform(put(CONTACT_URL + "/" + 1)
-                        .header("Authorization", token)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(asJsonString(input)))
-                .andExpect(status().is(400))
                 .andReturn();
         logger.info("status code: " + result.getResponse().getStatus());
         logger.info("response content:\n" + result.getResponse().getContentAsString());

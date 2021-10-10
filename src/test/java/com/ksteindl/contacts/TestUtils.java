@@ -20,7 +20,6 @@ public class TestUtils {
        contactInput.setFirstName(CONTACT_TEST_INPUT_FIRSTNAME);
        contactInput.setLastName(CONTACT_TEST_INPUT_LASTNAME);
        contactInput.setPhone(CONTACT_TEST_INPUT_PHONE);
-       contactInput.setStatus(Status.ACTIVE.name());
        return contactInput;
     }
 
@@ -38,7 +37,6 @@ public class TestUtils {
         contactInput.setFirstName(CONTACT_UPDATE_INPUT_FIRSTNAME);
         contactInput.setLastName(CONTACT_UPDATE_INPUT_LASTNAME);
         contactInput.setPhone(CONTACT_UPDATE_INPUT_PHONE);
-        contactInput.setStatus(Status.ACTIVE.name());
         return contactInput;
     }
 

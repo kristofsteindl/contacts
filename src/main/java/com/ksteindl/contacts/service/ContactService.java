@@ -123,7 +123,6 @@ public class ContactService {
         } else {
             phone = validateE164AndGetPhoneNumber(contactInput.getPhone());
         }
-        Status status = validateStatusAndGet(contactInput.getStatus());
 
         contact.setFirstName(contactInput.getFirstName());
         contact.setLastName(contactInput.getLastName());
@@ -131,7 +130,6 @@ public class ContactService {
         contact.setComment(contactInput.getComment());
         contact.setCompany(company);
         contact.setPhone(phone);
-        contact.setStatus(status);
         return contactRepository.save(contact);
     }
 
@@ -142,15 +140,6 @@ public class ContactService {
         message.setSubject("welcome");
         message.setText(String.format("Üdv, %s!", contact.getFirstName()));
         mailSender.send(message);
-    }
-
-    private Status validateStatusAndGet(String stringStatus) {
-        try {
-            return Status.valueOf(stringStatus);
-        } catch (IllegalArgumentException exception) {
-            throw new ValidationException(String.format("%s is not valid status, must be one of the following: %s", stringStatus, Arrays.asList(Status.values()).toString()));
-        }
-
     }
 
     private String validateE164AndGetPhoneNumber(String stringPhone) {

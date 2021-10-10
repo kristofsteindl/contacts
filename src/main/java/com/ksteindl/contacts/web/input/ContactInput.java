@@ -26,9 +26,5 @@ public class ContactInput {
 
     private String comment;
 
-    @NotBlank(message = "Status cannot be blank (status)")
-    private String status;
-
-
 
 }

@@ -48,6 +48,10 @@ public class Contact implements Cloneable {
         this.updatedAt = OffsetDateTime.now();
     }
 
+    public Contact() {
+        this.status = Status.ACTIVE;
+    }
+
     @Override
     public String toString() {
         return "Contact{" +
