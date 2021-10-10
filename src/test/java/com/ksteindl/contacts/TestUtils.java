@@ -42,23 +42,23 @@ public class TestUtils {
         return contactInput;
     }
 
-    public static final Long CONTACT_PRESTORED_INPUT_COMPANY_ID = 2l;
-    public static final String CONTACT_PRESTORED_INPUT_COMMENT = "prestored";
-    public static final String CONTACT_PRESTORED_INPUT_EMAIL = "prestored.input@company.com";
-    public static final String CONTACT_PRESTORED_INPUT_FIRSTNAME = "Prestored";
-    public static final String CONTACT_PRESTORED_INPUT_LASTNAME = "Input";
-    public static final String CONTACT_PRESTORED_INPUT_PHONE = "+3672445678";
-    public static ContactInput getPrestoredContactInput() {
-        ContactInput contactInput = new ContactInput();
-        contactInput.setCompanyId(CONTACT_PRESTORED_INPUT_COMPANY_ID);
-        contactInput.setComment(CONTACT_PRESTORED_INPUT_COMMENT);
-        contactInput.setEmail(CONTACT_PRESTORED_INPUT_EMAIL);
-        contactInput.setFirstName(CONTACT_PRESTORED_INPUT_FIRSTNAME);
-        contactInput.setLastName(CONTACT_PRESTORED_INPUT_LASTNAME);
-        contactInput.setPhone(CONTACT_PRESTORED_INPUT_PHONE);
-        contactInput.setStatus(Status.ACTIVE.name());
-        return contactInput;
-    }
+//    public static final Long CONTACT_PRESTORED_INPUT_COMPANY_ID = 2l;
+//    public static final String CONTACT_PRESTORED_INPUT_COMMENT = "prestored";
+//    public static final String CONTACT_PRESTORED_INPUT_EMAIL = "prestored.input@company.com";
+//    public static final String CONTACT_PRESTORED_INPUT_FIRSTNAME = "Input";
+//    public static final String CONTACT_PRESTORED_INPUT_LASTNAME = "Prestored";
+//    public static final String CONTACT_PRESTORED_INPUT_PHONE = "+3672445678";
+//    public static ContactInput getPrestoredContactInput() {
+//        ContactInput contactInput = new ContactInput();
+//        contactInput.setCompanyId(CONTACT_PRESTORED_INPUT_COMPANY_ID);
+//        contactInput.setComment(CONTACT_PRESTORED_INPUT_COMMENT);
+//        contactInput.setEmail(CONTACT_PRESTORED_INPUT_EMAIL);
+//        contactInput.setFirstName(CONTACT_PRESTORED_INPUT_FIRSTNAME);
+//        contactInput.setLastName(CONTACT_PRESTORED_INPUT_LASTNAME);
+//        contactInput.setPhone(CONTACT_PRESTORED_INPUT_PHONE);
+//        contactInput.setStatus(Status.ACTIVE.name());
+//        return contactInput;
+//    }
 
     public static final String ALPHA_COMPANY = "Alpha Company";
     public static final String BETA_COMPANY = "Beta Company";

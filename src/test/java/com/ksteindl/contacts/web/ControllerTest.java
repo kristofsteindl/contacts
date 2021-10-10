@@ -29,8 +29,7 @@ import org.springframework.test.web.servlet.MvcResult;
 
 import javax.transaction.Transactional;
 
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -716,7 +715,8 @@ public class ControllerTest extends BaseTests {
     @Test
     void testFindContactById_whenCorrect_got201(@Autowired ContactRepository contactRepository) throws Exception {
         String token = jwtProvider.generateToken(TestUtils.ADMIN_USERNAME);
-        Contact stored = contactRepository.findAll().stream().filter(contact -> contact.getFirstName().equals(TestUtils.CONTACT_PRESTORED_INPUT_FIRSTNAME)).findAny().get();
+        //Contact stored = contactRepository.findAll().stream().filter(contact -> contact.getFirstName().equals(TestUtils.CONTACT_PRESTORED_INPUT_FIRSTNAME)).findAny().get();
+        Contact stored = contactRepository.findById(1l).get();
         MvcResult result = mvc.perform(get(CONTACT_URL + "/" + stored.getId())
                         .header("Authorization", token))
                 .andExpect(status().is(200))
@@ -727,7 +727,8 @@ public class ControllerTest extends BaseTests {
 
     @Test
     void testFindContactById_whenNotLoggedIn_got401(@Autowired ContactRepository contactRepository) throws Exception {
-        Contact stored = contactRepository.findAll().stream().filter(contact -> contact.getFirstName().equals(TestUtils.CONTACT_PRESTORED_INPUT_FIRSTNAME)).findAny().get();
+        //Contact stored = contactRepository.findAll().stream().filter(contact -> contact.getFirstName().equals(TestUtils.CONTACT_PRESTORED_INPUT_FIRSTNAME)).findAny().get();
+        Contact stored = contactRepository.findById(1l).get();
         MvcResult result = mvc.perform(get(CONTACT_URL + "/" + stored.getId()))
                 .andExpect(status().is(401))
                 .andReturn();
@@ -749,7 +750,8 @@ public class ControllerTest extends BaseTests {
     @Test
     void testFindContactById_whenCorrectInput_gotCorrectResponse(@Autowired ContactRepository contactRepository) throws Exception {
         String token = jwtProvider.generateToken(TestUtils.ADMIN_USERNAME);
-        Contact stored = contactRepository.findAll().stream().filter(contact -> contact.getFirstName().equals(TestUtils.CONTACT_PRESTORED_INPUT_FIRSTNAME)).findAny().get();
+        //Contact stored = contactRepository.findAll().stream().filter(contact -> contact.getFirstName().equals(TestUtils.CONTACT_PRESTORED_INPUT_FIRSTNAME)).findAny().get();
+        Contact stored = contactRepository.findById(1l).get();
         MvcResult result = mvc.perform(get(CONTACT_URL + "/" + stored.getId())
                         .header("Authorization", token))
                 .andExpect(status().is(200))
@@ -768,14 +770,227 @@ public class ControllerTest extends BaseTests {
     @Test
     void testFindContactById_whenCorrectInput_storedDataIsCorrect(@Autowired ContactRepository contactRepository) throws Exception {
         String token = jwtProvider.generateToken(TestUtils.ADMIN_USERNAME);
-        Contact stored = contactRepository.findAll().stream().filter(contact -> contact.getFirstName().equals(TestUtils.CONTACT_PRESTORED_INPUT_FIRSTNAME)).findAny().get();
-        MvcResult result = mvc.perform(get(CONTACT_URL + "/" + stored.getId())
+        //Contact stored = contactRepository.findAll().stream().filter(contact -> contact.getFirstName().equals(TestUtils.CONTACT_PRESTORED_INPUT_FIRSTNAME)).findAny().get();
+        Contact stored = contactRepository.findById(1l).get();
+        MvcResult result = mvc.perform(get(CONTACT_URL + "/1" + stored.getId())
                         .header("Authorization", token))
                 .andExpect(status().is(200))
                 .andReturn();
         logger.info("status code: " + result.getResponse().getStatus());
         logger.info("response content:\n" + result.getResponse().getContentAsString());
     }
+
+    //QUERY CONTACTS
+    @Test
+    void testQueryContacts_withDefault_got200() throws Exception {
+        String token = jwtProvider.generateToken(TestUtils.ADMIN_USERNAME);
+        MvcResult result = mvc.perform(get(CONTACT_URL)
+                        .header("Authorization", token))
+                .andExpect(status().is(200))
+                .andReturn();
+        logger.info("status code: " + result.getResponse().getStatus());
+        logger.info("response content:\n" + result.getResponse().getContentAsString());
+    }
+
+    @Test
+    void testQueryContacts_whenNotLoggedIn_got401() throws Exception {
+        MvcResult result = mvc.perform(get(CONTACT_URL))
+                .andExpect(status().is(401))
+                .andReturn();
+        logger.info("status code: " + result.getResponse().getStatus());
+        logger.info("response content:\n" + result.getResponse().getContentAsString());
+    }
+
+    @Test
+    void testQueryContacts_withDefault_gotGotRightStructure() throws Exception {
+        String token = jwtProvider.generateToken(TestUtils.ADMIN_USERNAME);
+        MvcResult result = mvc.perform(get(CONTACT_URL)
+                        .header("Authorization", token))
+                .andExpect(status().is(200))
+                .andExpect(jsonPath("$.content").isArray())
+                .andExpect(jsonPath("$.totalItems").isNumber())
+                .andExpect(jsonPath("$.totalPages").isNumber())
+                .andExpect(jsonPath("$.currentPage").isNumber())
+                .andReturn();
+        logger.info("status code: " + result.getResponse().getStatus());
+        logger.info("response content:\n" + result.getResponse().getContentAsString());
+    }
+
+    @Test
+    void testQueryContacts_withDefault_gotGotRightPaging() throws Exception {
+        String token = jwtProvider.generateToken(TestUtils.ADMIN_USERNAME);
+        MvcResult result = mvc.perform(get(CONTACT_URL)
+                        .header("Authorization", token))
+                .andExpect(status().is(200))
+                .andExpect(jsonPath("$.content", hasSize(10)))
+                .andExpect(jsonPath("$.totalItems", is(24)))
+                .andExpect(jsonPath("$.totalPages", is(3)))
+                .andExpect(jsonPath("$.currentPage", is(0)))
+                .andReturn();
+        logger.info("status code: " + result.getResponse().getStatus());
+        logger.info("response content:\n" + result.getResponse().getContentAsString());
+    }
+
+    @Test
+    void testQueryContacts_whenSecondPage_gotGotRightPaging() throws Exception {
+        String token = jwtProvider.generateToken(TestUtils.ADMIN_USERNAME);
+        MvcResult result = mvc.perform(get(CONTACT_URL + "?page=1")
+                        .header("Authorization", token))
+                .andExpect(status().is(200))
+                .andExpect(jsonPath("$.content", hasSize(10)))
+                .andExpect(jsonPath("$.totalItems", is(24)))
+                .andExpect(jsonPath("$.totalPages", is(3)))
+                .andExpect(jsonPath("$.currentPage", is(1)))
+                .andReturn();
+        logger.info("status code: " + result.getResponse().getStatus());
+        logger.info("response content:\n" + result.getResponse().getContentAsString());
+    }
+
+    @Test
+    void testQueryContacts_whenSecondPage_gotGotCorrectData() throws Exception {
+        String token = jwtProvider.generateToken(TestUtils.ADMIN_USERNAME);
+        MvcResult result = mvc.perform(get(CONTACT_URL + "?page=1")
+                        .header("Authorization", token))
+                .andExpect(status().is(200))
+                .andExpect(jsonPath("$.content[0].firstName", is("Z")))
+                .andExpect(jsonPath("$.content[9].firstName", is("Z")))
+                .andReturn();
+        logger.info("status code: " + result.getResponse().getStatus());
+        logger.info("response content:\n" + result.getResponse().getContentAsString());
+    }
+
+    @Test
+    void testQueryContacts_whenThirdPage_gotGotCorrectData() throws Exception {
+        String token = jwtProvider.generateToken(TestUtils.ADMIN_USERNAME);
+        MvcResult result = mvc.perform(get(CONTACT_URL + "?page=2")
+                        .header("Authorization", token))
+                .andExpect(status().is(200))
+                .andExpect(jsonPath("$.content[0].firstName", is("Z")))
+                .andExpect(jsonPath("$.content[3].firstName", is("Z")))
+                .andReturn();
+        logger.info("status code: " + result.getResponse().getStatus());
+        logger.info("response content:\n" + result.getResponse().getContentAsString());
+    }
+
+    @Test
+    void testQueryContacts_whenDefault_gotSortedByName() throws Exception {
+        String token = jwtProvider.generateToken(TestUtils.ADMIN_USERNAME);
+        MvcResult result = mvc.perform(get(CONTACT_URL)
+                        .header("Authorization", token))
+                .andExpect(status().is(200))
+                .andExpect(jsonPath("$.content[0].lastName", is("Balogh")))
+                .andExpect(jsonPath("$.content[1].lastName", is("Donath")))
+                .andExpect(jsonPath("$.content[2].lastName", is("Donath")))
+                .andExpect(jsonPath("$.content[3].lastName", is("Takacs")))
+                .andExpect(jsonPath("$.content[1].firstName", is("Andras")))
+                .andReturn();
+        logger.info("status code: " + result.getResponse().getStatus());
+        logger.info("response content:\n" + result.getResponse().getContentAsString());
+    }
+
+    @Test
+    void testQueryContacts_whenSortByPhone_gotSortedByPhone() throws Exception {
+        String token = jwtProvider.generateToken(TestUtils.ADMIN_USERNAME);
+        MvcResult result = mvc.perform(get(CONTACT_URL + "?sortBy=phone")
+                        .header("Authorization", token))
+                .andExpect(status().is(200))
+                .andExpect(jsonPath("$.content[0].phone", is("+14155552671")))
+                .andExpect(jsonPath("$.content[1].phone", is("+360000001")))
+                .andExpect(jsonPath("$.content[2].phone", is("+360000002")))
+                .andExpect(jsonPath("$.content[3].phone", is("+360000004")))
+                .andExpect(jsonPath("$.content[4].phone", is("+3699999999")))
+                .andReturn();
+        logger.info("status code: " + result.getResponse().getStatus());
+        logger.info("response content:\n" + result.getResponse().getContentAsString());
+    }
+
+    @Test
+    void testQueryContacts_whenSortByEmail_gotSortedByEmail() throws Exception {
+        String token = jwtProvider.generateToken(TestUtils.ADMIN_USERNAME);
+        MvcResult result = mvc.perform(get(CONTACT_URL + "?sortBy=email")
+                        .header("Authorization", token))
+                .andExpect(status().is(200))
+                .andExpect(jsonPath("$.content[0].email", is("b.donath@alpha.com")))
+                .andExpect(jsonPath("$.content[1].email", is("donath.a@beta.com")))
+                .andExpect(jsonPath("$.content[2].email", is("uzeteny.balogh@donath.hu")))
+                .andExpect(jsonPath("$.content[3].email", is("uzeteny.takacs@takacs.hu")))
+                .andExpect(jsonPath("$.content[4].email", is("z.z@z.com")))
+
+                .andReturn();
+        logger.info("status code: " + result.getResponse().getStatus());
+        logger.info("response content:\n" + result.getResponse().getContentAsString());
+    }
+
+    @Test
+    void testQueryContacts_whenSortByCompany_gotSortedByCompany() throws Exception {
+        String token = jwtProvider.generateToken(TestUtils.ADMIN_USERNAME);
+        MvcResult result = mvc.perform(get(CONTACT_URL + "?sortBy=company")
+                        .header("Authorization", token))
+                .andExpect(status().is(200))
+                .andExpect(jsonPath("$.content[0].company.name", is(TestUtils.ALPHA_COMPANY)))
+                .andExpect(jsonPath("$.content[1].company.name", is(TestUtils.BETA_COMPANY)))
+                .andExpect(jsonPath("$.content[2].company.name", is(TestUtils.BETA_COMPANY)))
+                .andExpect(jsonPath("$.content[3].company.name", is(TestUtils.GAMMA_COMPANY)))
+                .andExpect(jsonPath("$.content[4].company.name", is(TestUtils.GAMMA_COMPANY)))
+
+                .andReturn();
+        logger.info("status code: " + result.getResponse().getStatus());
+        logger.info("response content:\n" + result.getResponse().getContentAsString());
+    }
+
+    @Test
+    void testQueryContacts_whenQueryByZeteny_gotTwoHits() throws Exception {
+        String token = jwtProvider.generateToken(TestUtils.ADMIN_USERNAME);
+        MvcResult result = mvc.perform(get(CONTACT_URL + "?queryString=Zeteny")
+                        .header("Authorization", token))
+                .andExpect(status().is(200))
+                .andExpect(jsonPath("$.content[0].firstName", is("Zeteny")))
+                .andExpect(jsonPath("$.content[1].firstName", is("Zeteny")))
+                .andExpect(jsonPath("$.totalItems", is(2)))
+                .andReturn();
+        logger.info("status code: " + result.getResponse().getStatus());
+        logger.info("response content:\n" + result.getResponse().getContentAsString());
+    }
+
+    @Test
+    void testQueryContacts_whenQueryByOnath_gotThreeHits() throws Exception {
+        String token = jwtProvider.generateToken(TestUtils.ADMIN_USERNAME);
+        MvcResult result = mvc.perform(get(CONTACT_URL + "?queryString=onath")
+                        .header("Authorization", token))
+                .andExpect(status().is(200))
+                .andExpect(jsonPath("$.content[*].lastName", hasItem("Donath")))
+                .andExpect(jsonPath("$.content[*].email", hasItem("uzeteny.balogh@donath.hu")))
+                .andExpect(jsonPath("$.totalItems", is(3)))
+                .andReturn();
+        logger.info("status code: " + result.getResponse().getStatus());
+        logger.info("response content:\n" + result.getResponse().getContentAsString());
+    }
+
+    @Test
+    void testQueryContacts_whenQueryByPhone_gotThreeHits() throws Exception {
+        String token = jwtProvider.generateToken(TestUtils.ADMIN_USERNAME);
+        MvcResult result = mvc.perform(get(CONTACT_URL + "?queryString=000000")
+                        .header("Authorization", token))
+                .andExpect(status().is(200))
+                .andExpect(jsonPath("$.totalItems", is(3)))
+                .andReturn();
+        logger.info("status code: " + result.getResponse().getStatus());
+        logger.info("response content:\n" + result.getResponse().getContentAsString());
+    }
+
+    @Test
+    void testQueryContacts_whenQueryByDummy_gotZeroHit() throws Exception {
+        String token = jwtProvider.generateToken(TestUtils.ADMIN_USERNAME);
+        MvcResult result = mvc.perform(get(CONTACT_URL + "?queryString=dummy")
+                        .header("Authorization", token))
+                .andExpect(status().is(200))
+                .andExpect(jsonPath("$.totalItems", is(0)))
+                .andReturn();
+        logger.info("status code: " + result.getResponse().getStatus());
+        logger.info("response content:\n" + result.getResponse().getContentAsString());
+    }
+
+
 
 
     //COMPANY AND APPUSER CONTROLLER TESTS
